@@ -9,6 +9,7 @@ A collection of install/uninstall scripts for setting up a fresh Ubuntu machine 
 | `install-build-essential.sh` | gcc, g++, make (build-essential) | `--uninstall`, `--help` |
 | `install-curl.sh` | curl | `--uninstall`, `--help` |
 | `install-docker.sh` | Docker CE, Docker Compose | `--uninstall`, `--help` |
+| `install-ffmpeg.sh` | ffmpeg (audio/video converter) | `--uninstall`, `--help` |
 | `install-fzf.sh` | fzf (fuzzy finder, Ctrl+R history search) | `--uninstall`, `--help` |
 | `install-gh.sh` | GitHub CLI | `--uninstall`, `--login`, `--help` |
 | `install-git.sh` | Git | `--uninstall`, `--configure`, `--help` |
