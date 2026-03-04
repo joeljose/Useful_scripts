@@ -30,6 +30,13 @@ uninstall_fzf() {
 
     sudo apt-get autoremove -y
 
+    # Remove keybindings from ~/.bashrc
+    if grep -qF "source /usr/share/doc/fzf/examples/key-bindings.bash" "$HOME/.bashrc"; then
+        sed -i '/# fzf keybindings/d' "$HOME/.bashrc"
+        sed -i '\|source /usr/share/doc/fzf/examples/key-bindings.bash|d' "$HOME/.bashrc"
+        echo "Removed fzf keybindings from ~/.bashrc"
+    fi
+
     echo ""
     echo "fzf has been removed."
     echo "To reinstall, run: $0"
@@ -72,14 +79,25 @@ if ! sudo apt-get install -y fzf; then
     exit 1
 fi
 
+# Add keybindings to ~/.bashrc if not already present
+FZF_SOURCE="source /usr/share/doc/fzf/examples/key-bindings.bash"
+if ! grep -qF "$FZF_SOURCE" "$HOME/.bashrc"; then
+    {
+        echo ""
+        echo "# fzf keybindings (Ctrl+R, Ctrl+T, Alt+C)"
+        echo "$FZF_SOURCE"
+    } >> "$HOME/.bashrc"
+    echo "Added fzf keybindings to ~/.bashrc"
+else
+    echo "fzf keybindings already in ~/.bashrc"
+fi
+
 # Verify
 echo ""
 echo "fzf installed successfully."
 fzf --version
 echo ""
-echo "Keybindings (add to ~/.bashrc if not already present):"
-echo "  source /usr/share/doc/fzf/examples/key-bindings.bash"
-echo ""
+echo "Keybindings available (open a new terminal or run 'source ~/.bashrc'):"
 echo "  Ctrl+R  Fuzzy search command history"
 echo "  Ctrl+T  Fuzzy find files"
 echo "  Alt+C   Fuzzy cd into directories"
