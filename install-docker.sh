@@ -39,6 +39,7 @@ uninstall_docker() {
 
     echo "Removing Docker repository and GPG key..."
     sudo rm -f /etc/apt/sources.list.d/docker.sources /etc/apt/sources.list.d/docker.list
+    sudo rm -f /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-*.list
     sudo rm -f /etc/apt/keyrings/docker.asc
 
     sudo apt-get autoremove -y
