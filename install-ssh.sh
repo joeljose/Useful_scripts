@@ -65,7 +65,9 @@ uninstall_ssh() {
         exit 1
     fi
 
-    sudo apt-get autoremove
+    if ! sudo apt-get autoremove; then
+        echo "Warning: autoremove failed. Some unused packages may remain."
+    fi
 
     echo ""
     echo "OpenSSH has been removed."
@@ -143,7 +145,9 @@ fi
 echo ""
 echo "OpenSSH installed successfully."
 echo "  client: $(ssh -V 2>&1)"
-echo "  server: $(sudo systemctl is-active ssh)"
+if [[ "$start_ssh" == [yY] ]]; then
+    echo "  server: $(sudo systemctl is-active ssh)"
+fi
 echo ""
 
 # Offer key generation

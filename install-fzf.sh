@@ -28,12 +28,16 @@ uninstall_fzf() {
         exit 1
     fi
 
-    sudo apt-get autoremove
+    if ! sudo apt-get autoremove; then
+        echo "Warning: autoremove failed. Some unused packages may remain."
+    fi
 
     # Remove keybindings from ~/.bashrc
     if grep -qF "source /usr/share/doc/fzf/examples/key-bindings.bash" "$HOME/.bashrc"; then
-        # Remove the blank line, comment, and source line added during install
-        sed -i -e '/^$/N;/\n# fzf keybindings/d' -e '\|source /usr/share/doc/fzf/examples/key-bindings.bash|d' "$HOME/.bashrc"
+        # Remove comment and source line individually, then strip trailing blank lines
+        sed -i '/^# fzf keybindings/d' "$HOME/.bashrc"
+        sed -i '\|source /usr/share/doc/fzf/examples/key-bindings.bash|d' "$HOME/.bashrc"
+        sed -i -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$HOME/.bashrc"
         echo "Removed fzf keybindings from ~/.bashrc"
     fi
 

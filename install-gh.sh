@@ -37,7 +37,9 @@ uninstall_gh() {
     sudo rm -f "$KEYRING_FILE"
     sudo rm -f /etc/apt/sources.list.d/github-cli.list
 
-    sudo apt-get autoremove
+    if ! sudo apt-get autoremove; then
+        echo "Warning: autoremove failed. Some unused packages may remain."
+    fi
 
     echo ""
     echo "GitHub CLI has been removed."
@@ -162,5 +164,7 @@ echo ""
 # Offer login
 read -rp "Authenticate with GitHub now? [y/N]: " login
 if [[ "$login" == [yY] ]]; then
-    gh auth login || echo "Login skipped. Run '$0 --login' later."
+    if ! gh auth login; then
+        echo "Login skipped. Run '$0 --login' later."
+    fi
 fi

@@ -42,7 +42,9 @@ uninstall_docker() {
     sudo rm -f /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-*.list
     sudo rm -f /etc/apt/keyrings/docker.asc
 
-    sudo apt-get autoremove
+    if ! sudo apt-get autoremove; then
+        echo "Warning: autoremove failed. Some unused packages may remain."
+    fi
 
     echo ""
     echo "Docker has been fully removed."

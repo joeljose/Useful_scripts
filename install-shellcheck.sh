@@ -28,7 +28,9 @@ uninstall_shellcheck() {
         exit 1
     fi
 
-    sudo apt-get autoremove
+    if ! sudo apt-get autoremove; then
+        echo "Warning: autoremove failed. Some unused packages may remain."
+    fi
 
     echo ""
     echo "ShellCheck has been removed."
