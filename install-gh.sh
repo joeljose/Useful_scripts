@@ -37,7 +37,7 @@ uninstall_gh() {
     sudo rm -f "$KEYRING_FILE"
     sudo rm -f /etc/apt/sources.list.d/github-cli.list
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     echo ""
     echo "GitHub CLI has been removed."
@@ -62,7 +62,10 @@ login_gh() {
     fi
 
     echo "Logging in to GitHub..."
-    gh auth login
+    if ! gh auth login; then
+        echo "Login skipped."
+        return 0
+    fi
 }
 
 # Check if running as root
@@ -71,11 +74,22 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_gh ;;
     --login)     login_gh; exit 0 ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac
@@ -148,5 +162,5 @@ echo ""
 # Offer login
 read -rp "Authenticate with GitHub now? [y/N]: " login
 if [[ "$login" == [yY] ]]; then
-    gh auth login
+    gh auth login || echo "Login skipped. Run '$0 --login' later."
 fi

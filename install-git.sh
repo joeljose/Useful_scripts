@@ -11,6 +11,11 @@ usage() {
 }
 
 configure_git() {
+    if ! command -v git &>/dev/null; then
+        echo "Error: git is not installed. Run $0 first."
+        exit 1
+    fi
+
     local current_name current_email
 
     current_name=$(git config --global user.name 2>/dev/null || echo "")
@@ -57,7 +62,7 @@ uninstall_git() {
         exit 1
     fi
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     echo ""
     echo "Git has been removed."
@@ -71,11 +76,22 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_git ;;
     --configure) configure_git; exit 0 ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac

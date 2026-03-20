@@ -1,7 +1,7 @@
 # Useful_scripts
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![ShellCheck](https://img.shields.io/badge/ShellCheck-passing-brightgreen.svg)](https://www.shellcheck.net/)
+[![ShellCheck](https://github.com/joeljose/Useful_scripts/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/joeljose/Useful_scripts/actions/workflows/shellcheck.yml)
 [![Platform](https://img.shields.io/badge/Ubuntu-20.04%2B-E95420.svg)](https://ubuntu.com/)
 
 Portable shell scripts to install and uninstall common Ubuntu tools — with clean error handling, idempotency, and ShellCheck compliance.
@@ -57,6 +57,7 @@ cd Useful_scripts
 | `install-shellcheck.sh` | ShellCheck | `--uninstall`, `--help` |
 | `install-ssh.sh` | OpenSSH client & server | `--uninstall`, `--keygen`, `--help` |
 | `install-tmux.sh` | tmux (terminal multiplexer) | `--uninstall`, `--help` |
+| `install-tree.sh` | tree (directory listing) | `--uninstall`, `--help` |
 | `install-vim.sh` | Vim | `--uninstall`, `--help` |
 
 ## Requirements

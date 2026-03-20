@@ -28,12 +28,12 @@ uninstall_fzf() {
         exit 1
     fi
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     # Remove keybindings from ~/.bashrc
     if grep -qF "source /usr/share/doc/fzf/examples/key-bindings.bash" "$HOME/.bashrc"; then
-        sed -i '/# fzf keybindings/d' "$HOME/.bashrc"
-        sed -i '\|source /usr/share/doc/fzf/examples/key-bindings.bash|d' "$HOME/.bashrc"
+        # Remove the blank line, comment, and source line added during install
+        sed -i -e '/^$/N;/\n# fzf keybindings/d' -e '\|source /usr/share/doc/fzf/examples/key-bindings.bash|d' "$HOME/.bashrc"
         echo "Removed fzf keybindings from ~/.bashrc"
     fi
 
@@ -49,10 +49,21 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_fzf ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac
@@ -80,8 +91,11 @@ if ! sudo apt-get install -y fzf; then
 fi
 
 # Add keybindings to ~/.bashrc if not already present
-FZF_SOURCE="source /usr/share/doc/fzf/examples/key-bindings.bash"
-if ! grep -qF "$FZF_SOURCE" "$HOME/.bashrc"; then
+FZF_KEYBINDINGS="/usr/share/doc/fzf/examples/key-bindings.bash"
+FZF_SOURCE="source $FZF_KEYBINDINGS"
+if [[ ! -f "$FZF_KEYBINDINGS" ]]; then
+    echo "Note: fzf keybindings file not found at $FZF_KEYBINDINGS — skipping .bashrc setup."
+elif ! grep -qF "$FZF_SOURCE" "$HOME/.bashrc"; then
     {
         echo ""
         echo "# fzf keybindings (Ctrl+R, Ctrl+T, Alt+C)"

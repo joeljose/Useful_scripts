@@ -28,7 +28,7 @@ uninstall_tmux() {
         exit 1
     fi
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     echo ""
     echo "tmux has been removed."
@@ -42,10 +42,21 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_tmux ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac

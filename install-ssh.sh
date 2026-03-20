@@ -25,7 +25,8 @@ generate_key() {
     read -rp "Enter email for SSH key: " email
     if [[ -z "$email" ]]; then
         echo "Error: Email is required."
-        return 1
+        trap - ERR
+        exit 1
     fi
 
     key_file="$HOME/.ssh/id_ed25519"
@@ -64,7 +65,7 @@ uninstall_ssh() {
         exit 1
     fi
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     echo ""
     echo "OpenSSH has been removed."
@@ -78,11 +79,22 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_ssh ;;
     --keygen)    generate_key; exit 0 ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac
@@ -111,14 +123,20 @@ if ! sudo apt-get install -y openssh-client openssh-server; then
     exit 1
 fi
 
-# Enable and start SSH server
-if ! sudo systemctl enable ssh; then
-    echo "Error: Failed to enable SSH server."
-    exit 1
-fi
-if ! sudo systemctl start ssh; then
-    echo "Error: Failed to start SSH server."
-    exit 1
+# Optionally enable and start SSH server
+read -rp "Enable and start SSH server? This opens port 22 for remote connections. [y/N]: " start_ssh
+if [[ "$start_ssh" == [yY] ]]; then
+    if ! sudo systemctl enable ssh; then
+        echo "Error: Failed to enable SSH server."
+        exit 1
+    fi
+    if ! sudo systemctl start ssh; then
+        echo "Error: Failed to start SSH server."
+        exit 1
+    fi
+else
+    echo "SSH server installed but not enabled."
+    echo "To start later: sudo systemctl enable --now ssh"
 fi
 
 # Verify

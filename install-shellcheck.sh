@@ -28,7 +28,7 @@ uninstall_shellcheck() {
         exit 1
     fi
 
-    sudo apt-get autoremove -y
+    sudo apt-get autoremove
 
     echo ""
     echo "ShellCheck has been removed."
@@ -42,17 +42,28 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
+# Handle --help before OS check so it works everywhere
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for apt-get (Debian/Ubuntu only)
+if ! command -v apt-get &>/dev/null; then
+    echo "Error: This script requires apt-get (Debian/Ubuntu)."
+    exit 1
+fi
+
 # Parse flags
 case "${1:-}" in
     --uninstall) uninstall_shellcheck ;;
-    --help|-h)   usage; exit 0 ;;
     "")          ;; # proceed with install
     *)           echo "Unknown option: $1"; usage; exit 1 ;;
 esac
 
 # Check if already installed
 if command -v shellcheck &>/dev/null; then
-    echo "ShellCheck is already installed: $(shellcheck --version | grep 'version:')"
+    echo "ShellCheck is already installed: $(shellcheck --version | grep 'version:' || true)"
     echo "To reinstall, run: $0 --uninstall && $0"
     exit 0
 fi
@@ -75,6 +86,6 @@ fi
 # Verify
 echo ""
 echo "ShellCheck installed successfully."
-shellcheck --version | grep 'version:'
+shellcheck --version | grep 'version:' || true
 echo ""
 echo "Usage: shellcheck yourscript.sh"
