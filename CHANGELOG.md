@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-03-21
+
+- Add `install-axel.sh`
+
 ## 2026-03-04
 
 - Add repo documentation: LICENSE, CONTRIBUTING, issue/PR templates
