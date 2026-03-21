@@ -44,6 +44,7 @@ cd Useful_scripts
 
 | Script | Installs | Flags |
 |--------|----------|-------|
+| `install-axel.sh` | axel (multi-connection download accelerator) | `--uninstall`, `--help` |
 | `install-build-essential.sh` | gcc, g++, make (build-essential) | `--uninstall`, `--help` |
 | `install-curl.sh` | curl | `--uninstall`, `--help` |
 | `install-docker.sh` | Docker CE, Docker Compose | `--uninstall`, `--help` |
